@@ -696,6 +696,8 @@
       function handleTouchMove(e) {
         if (!gameStarted || gameQueue.length === 0) return;
 
+        e.preventDefault();
+
         const touch = e.touches[0];
         const deltaY = touch.clientY - touchStartY;
         const deltaX = touch.clientX - touchStartX;
@@ -721,6 +723,8 @@
 
       function handleTouchEnd(e) {
         if (!gameStarted || gameQueue.length === 0) return;
+
+        e.preventDefault();
 
         const touch = e.changedTouches[0];
         const deltaY = touch.clientY - touchStartY;
