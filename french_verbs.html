@@ -1,847 +1,963 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>French Verbs Flashcard Game</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flashcard Game</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%);
-            min-height: 100vh;
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1rem;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 2rem;
-            padding-top: 2rem;
-        }
-        
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%);
+        min-height: 100vh;
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-top: 2rem;
+      }
+
+      .title {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #1f2937;
+        margin-bottom: 1rem;
+      }
+
+      .stats {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        font-size: 0.875rem;
+        color: #4b5563;
+        flex-wrap: wrap;
+      }
+
+      .stat-item {
+        background: white;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .game-container {
+        max-width: 28rem;
+        margin: 0 auto;
+      }
+
+      .card-container {
+        position: relative;
+        height: 20rem;
+        margin-bottom: 2rem;
+        cursor: pointer;
+        perspective: 1000px;
+        touch-action: pan-y;
+      }
+
+      .card-flip {
+        transform-style: preserve-3d;
+        transition: transform 0.6s;
+        width: 100%;
+        height: 100%;
+        position: relative;
+      }
+
+      .card-flip.flipped {
+        transform: rotateY(180deg);
+      }
+
+      .card-front,
+      .card-back {
+        backface-visibility: hidden;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: white;
+        border-radius: 0.75rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+      }
+
+      .card-front {
+        border: 4px solid #bfdbfe;
+      }
+
+      .card-back {
+        transform: rotateY(180deg);
+        border: 4px solid #bbf7d0;
+      }
+
+      .card-content {
+        text-align: center;
+      }
+
+      .original-text {
+        font-size: 1.875rem;
+        font-weight: bold;
+        color: #1e40af;
+      }
+
+      .russian-text {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #166534;
+      }
+
+      .controls {
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .controls h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        text-align: center;
+        color: #1f2937;
+      }
+
+      .button {
+        width: 100%;
+        font-weight: 600;
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-bottom: 0.75rem;
+        font-size: 1rem;
+      }
+
+      .button:last-child {
+        margin-bottom: 0;
+      }
+
+      .btn-blue {
+        background: #3b82f6;
+        color: white;
+      }
+
+      .btn-blue:hover {
+        background: #2563eb;
+      }
+
+      .btn-yellow {
+        background: #eab308;
+        color: white;
+      }
+
+      .btn-yellow:hover {
+        background: #ca8a04;
+      }
+
+      .btn-green {
+        background: #22c55e;
+        color: white;
+      }
+
+      .btn-green:hover {
+        background: #16a34a;
+      }
+
+      .instructions {
+        background: #f3f4f6;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        font-size: 0.875rem;
+        color: #374151;
+      }
+
+      .instructions h4 {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .instructions ul {
+        list-style-type: disc;
+        margin-left: 1.25rem;
+      }
+
+      .instructions li {
+        margin-bottom: 0.25rem;
+      }
+
+      .kbd {
+        background: #e5e7eb;
+        padding: 0.125rem 0.25rem;
+        border-radius: 0.25rem;
+        font-family: monospace;
+        font-size: 0.75rem;
+      }
+
+      .game-over {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+
+      .game-over.hidden {
+        display: none;
+      }
+
+      .game-over-content {
+        background: white;
+        border-radius: 0.75rem;
+        padding: 2rem;
+        text-align: center;
+        max-width: 28rem;
+        margin: 0 1rem;
+      }
+
+      .game-over-emoji {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+      }
+
+      .game-over-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #1f2937;
+        margin-bottom: 1rem;
+      }
+
+      .game-over-text {
+        color: #6b7280;
+        margin-bottom: 1.5rem;
+      }
+
+      .text-blue {
+        color: #2563eb;
+      }
+      .text-green {
+        color: #16a34a;
+      }
+
+      .add-words {
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .add-words h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #1f2937;
+      }
+
+      .textarea {
+        width: 100%;
+        min-height: 100px;
+        padding: 0.75rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 0.5rem;
+        font-family: monospace;
+        font-size: 0.875rem;
+        resize: vertical;
+        margin-bottom: 0.75rem;
+      }
+
+      .textarea:focus {
+        outline: none;
+        border-color: #3b82f6;
+      }
+
+      .input-help {
+        font-size: 0.75rem;
+        color: #6b7280;
+        margin-bottom: 0.75rem;
+      }
+
+      .btn-purple {
+        background: #8b5cf6;
+        color: white;
+      }
+
+      .btn-purple:hover {
+        background: #7c3aed;
+      }
+
+      .btn-red {
+        background: #ef4444;
+        color: white;
+      }
+
+      .btn-red:hover {
+        background: #dc2626;
+      }
+
+      .storage-controls {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+
+      .swipe-indicator {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 3rem;
+        opacity: 0;
+        transition: opacity 0.2s;
+        pointer-events: none;
+        z-index: 10;
+      }
+
+      .swipe-indicator.show {
+        opacity: 0.7;
+      }
+
+      .swipe-up {
+        color: #22c55e;
+      }
+
+      .swipe-down {
+        color: #eab308;
+      }
+
+      .storage-controls .button {
+        flex: 1;
+        margin-bottom: 0;
+        min-width: 120px;
+      }
+
+      @media (max-width: 640px) {
         .title {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #1f2937;
-            margin-bottom: 1rem;
+          font-size: 2rem;
         }
-        
+
         .stats {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            font-size: 0.875rem;
-            color: #4b5563;
-            flex-wrap: wrap;
+          gap: 1rem;
         }
-        
-        .stat-item {
-            background: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        
-        .game-container {
-            max-width: 28rem;
-            margin: 0 auto;
-        }
-        
+
         .card-container {
-            position: relative;
-            height: 20rem;
-            margin-bottom: 2rem;
-            cursor: pointer;
-            perspective: 1000px;
+          height: 16rem;
         }
-        
-        .card-flip {
-            transform-style: preserve-3d;
-            transition: transform 0.6s;
-            width: 100%;
-            height: 100%;
-            position: relative;
+
+        .original-text {
+          font-size: 1.5rem;
         }
-        
-        .card-flip.flipped {
-            transform: rotateY(180deg);
-        }
-        
-        .card-front, .card-back {
-            backface-visibility: hidden;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: white;
-            border-radius: 0.75rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-        }
-        
-        .card-front {
-            border: 4px solid #bfdbfe;
-        }
-        
-        .card-back {
-            transform: rotateY(180deg);
-            border: 4px solid #bbf7d0;
-        }
-        
-        .card-content {
-            text-align: center;
-        }
-        
-        .card-label {
-            font-size: 0.875rem;
-            color: #6b7280;
-            margin-bottom: 0.5rem;
-        }
-        
-        .french-text {
-            font-size: 1.875rem;
-            font-weight: bold;
-            color: #1e40af;
-        }
-        
+
         .russian-text {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #166534;
+          font-size: 1.25rem;
         }
-        
-        .controls {
-            background: white;
-            border-radius: 0.5rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .controls h3 {
-            font-size: 1.125rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            text-align: center;
-            color: #1f2937;
-        }
-        
-        .button {
-            width: 100%;
-            font-weight: 600;
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-bottom: 0.75rem;
-            font-size: 1rem;
-        }
-        
-        .button:last-child {
-            margin-bottom: 0;
-        }
-        
-        .btn-blue {
-            background: #3b82f6;
-            color: white;
-        }
-        
-        .btn-blue:hover {
-            background: #2563eb;
-        }
-        
-        .btn-yellow {
-            background: #eab308;
-            color: white;
-        }
-        
-        .btn-yellow:hover {
-            background: #ca8a04;
-        }
-        
-        .btn-green {
-            background: #22c55e;
-            color: white;
-        }
-        
-        .btn-green:hover {
-            background: #16a34a;
-        }
-        
+
         .instructions {
-            background: #f3f4f6;
-            border-radius: 0.5rem;
-            padding: 1rem;
-            font-size: 0.875rem;
-            color: #374151;
+          font-size: 0.8rem;
         }
-        
-        .instructions h4 {
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-        
-        .instructions ul {
-            list-style-type: disc;
-            margin-left: 1.25rem;
-        }
-        
-        .instructions li {
-            margin-bottom: 0.25rem;
-        }
-        
-        .kbd {
-            background: #e5e7eb;
-            padding: 0.125rem 0.25rem;
-            border-radius: 0.25rem;
-            font-family: monospace;
-            font-size: 0.75rem;
-        }
-        
-        .game-over {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-        
-        .game-over.hidden {
-            display: none;
-        }
-        
-        .game-over-content {
-            background: white;
-            border-radius: 0.75rem;
-            padding: 2rem;
-            text-align: center;
-            max-width: 28rem;
-            margin: 0 1rem;
-        }
-        
-        .game-over-emoji {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-        }
-        
-        .game-over-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #1f2937;
-            margin-bottom: 1rem;
-        }
-        
-        .game-over-text {
-            color: #6b7280;
-            margin-bottom: 1.5rem;
-        }
-        
-        .text-blue { color: #2563eb; }
-        .text-green { color: #16a34a; }
-        
-        .add-words {
-            background: white;
-            border-radius: 0.5rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .add-words h3 {
-            font-size: 1.125rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: #1f2937;
-        }
-        
-        .textarea {
-            width: 100%;
-            min-height: 100px;
-            padding: 0.75rem;
-            border: 2px solid #e5e7eb;
-            border-radius: 0.5rem;
-            font-family: monospace;
-            font-size: 0.875rem;
-            resize: vertical;
-            margin-bottom: 0.75rem;
-        }
-        
-        .textarea:focus {
-            outline: none;
-            border-color: #3b82f6;
-        }
-        
-        .input-help {
-            font-size: 0.75rem;
-            color: #6b7280;
-            margin-bottom: 0.75rem;
-        }
-        
-        .btn-purple {
-            background: #8b5cf6;
-            color: white;
-        }
-        
-        .btn-purple:hover {
-            background: #7c3aed;
-        }
-        
-        .btn-red {
-            background: #ef4444;
-            color: white;
-        }
-        
-        .btn-red:hover {
-            background: #dc2626;
-        }
-        
-        .storage-controls {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-        
-        .storage-controls .button {
-            flex: 1;
-            margin-bottom: 0;
-            min-width: 120px;
-        }
-        
-        @media (max-width: 640px) {
-            .title {
-                font-size: 2rem;
-            }
-            
-            .stats {
-                gap: 1rem;
-            }
-            
-            .card-container {
-                height: 16rem;
-            }
-            
-            .french-text {
-                font-size: 1.5rem;
-            }
-            
-            .russian-text {
-                font-size: 1.25rem;
-            }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1 class="title">🇫🇷 French Verbs Flashcards</h1>
-            <div class="stats">
-                <div class="stat-item">
-                    <span><strong>Cards left:</strong></span> <span id="cardsLeft" class="text-blue">87</span>
-                </div>
-                <div class="stat-item">
-                    <span><strong>Known:</strong></span> <span id="knownCount" class="text-green">0</span>
-                </div>
+      <!-- Header -->
+      <div class="header">
+        <h1 class="title">Flashcards</h1>
+        <div class="stats">
+          <div class="stat-item">
+            <span><strong>My cards:</strong></span>
+            <span id="cardsLeft" class="text-blue"></span>
+          </div>
+          <div class="stat-item">
+            <span><strong>Done:</strong></span>
+            <span id="knownCount" class="text-green"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game Container -->
+      <div class="game-container">
+
+        <!-- Card -->
+        <div id="cardContainer" class="card-container">
+          <div id="flashcard" class="card-flip">
+            <!-- Front -->
+            <div class="card-front">
+              <div class="card-content">
+                <div id="word" class="original-text">Click to start!</div>
+              </div>
             </div>
+            <!-- Back (Russian) -->
+            <div class="card-back">
+              <div class="card-content">
+                <div id="translation" class="russian-text">Translation</div>
+              </div>
+            </div>
+          </div>
+          <!-- Swipe Indicators -->
+          <div id="swipeIndicator" class="swipe-indicator"></div>
         </div>
 
-        <!-- Game Container -->
-        <div class="game-container">
-            <!-- Card -->
-            <div id="cardContainer" class="card-container">
-                <div id="flashcard" class="card-flip">
-                    <!-- Front (French) -->
-                    <div class="card-front">
-                        <div class="card-content">
-                            <div class="card-label">French Verb</div>
-                            <div id="frenchWord" class="french-text">Click to start!</div>
-                        </div>
-                    </div>
-                    <!-- Back (Russian) -->
-                    <div class="card-back">
-                        <div class="card-content">
-                            <div class="card-label">Russian Translation</div>
-                            <div id="russianWord" class="russian-text">Перевод</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Add Words Section -->
-            <div class="add-words">
-                <h3>Add New Words</h3>
-                <textarea id="newWordsInput" class="textarea" placeholder="Enter words in format: french-word[TAB]translation&#10;Example:&#10;bonjour	hello&#10;merci	thank you"></textarea>
-                <div class="input-help">
-                    Format: french-word[TAB]translation (one pair per line)
-                </div>
-                <div class="storage-controls">
-                    <button id="addWordsBtn" class="button btn-purple">
-                        ➕ Add Words
-                    </button>
-                    <button id="resetBtn" class="button btn-red">
-                        🔄 Reset All
-                    </button>
-                </div>
-            </div>
-
-            <!-- Controls -->
-            <div class="controls">
-                <h3>Controls</h3>
-                <button id="flipBtn" class="button btn-blue">
-                    🔄 Flip Card (Space)
-                </button>
-                <button id="nextBtn" class="button btn-yellow">
-                    ⏭️ Next Card (N)
-                </button>
-                <button id="knowBtn" class="button btn-green">
-                    ✅ I Know This (K)
-                </button>
-            </div>
-
-            <!-- Instructions -->
-            <div class="instructions">
-                <h4>How to play:</h4>
-                <ul>
-                    <li>Click the card or press <span class="kbd">Space</span> to flip and see translation</li>
-                    <li>Press <span class="kbd">N</span> to move current word to end of queue</li>
-                    <li>Press <span class="kbd">K</span> if you know the word (removes from queue)</li>
-                </ul>
-            </div>
+        <!-- Controls -->
+        <div class="controls">
+          <h3>Controls</h3>
+          <button id="flipBtn" class="button btn-blue">🔄 Flip Card (Space/Tap)</button>
+          <button id="nextBtn" class="button btn-yellow">⏭️ Next Card (N/Swipe up)</button>
+          <button id="knowBtn" class="button btn-green">✅ I Know This (K/Swipe down)</button>
         </div>
 
-        <!-- Game Over Screen -->
-        <div id="gameOver" class="game-over hidden">
-            <div class="game-over-content">
-                <div class="game-over-emoji">🎉</div>
-                <h2 class="game-over-title">Congratulations!</h2>
-                <p class="game-over-text">You've learned all 87 French verbs!</p>
-                <button id="restartBtn" class="button btn-blue">
-                    Start Over
-                </button>
-            </div>
+        <!-- Instructions -->
+        <div class="instructions">
+          <h4>How to play:</h4>
+          <ul>
+            <li>
+              Click the card or press <span class="kbd">Space</span> or <span class="kbd">Tap</span> to flip and see
+              translation
+            </li>
+            <li>
+              Press <span class="kbd">N</span> or <span class="kbd">Swipe up</span> to move current word to end of queue
+            </li>
+            <li>
+              Press <span class="kbd">K</span> or <span class="kbd">Swipe down</span> if you know the word (removes from queue)
+            </li>
+            <li>
+              <strong>Mobile:</strong> Swipe ⬆️ to mark as known, swipe ⬇️ to move to
+              end
+            </li>
+          </ul>
         </div>
+
+        <!-- Add Words Section -->
+        <div class="add-words">
+          <h3>Add New Words</h3>
+          <textarea
+            id="newWordsInput"
+            class="textarea"
+            placeholder="Enter words in format: word=translation&#10;Example:&#10;bonjour	hello&#10;merci	thank you"
+          ></textarea>
+          <div class="input-help">
+            Format: word=translation (one pair per line)
+          </div>
+          <div class="storage-controls">
+            <button id="addWordsBtn" class="button btn-purple">➕ Add Words</button>
+            <button id="resetBtn" class="button btn-red">🔄 Reset All</button>
+          </div>
+        </div>
+
+      <!-- Game Over Screen -->
+      <div id="gameOver" class="game-over hidden">
+        <div class="game-over-content">
+          <div class="game-over-emoji">🎉</div>
+          <h2 class="game-over-title">Congratulations!</h2>
+          <p class="game-over-text">You've learned all 87 words!</p>
+          <button id="restartBtn" class="button btn-blue">Start Over</button>
+        </div>
+      </div>
     </div>
 
     <script>
-        // Vocabulary data
-        const verbs = [
-            {french: "abandonner", russian: "бросать, оставлять"},
-            {french: "accorder", russian: "предоставлять, давать"},
-            {french: "adapter", russian: "адаптировать, приспосабливать"},
-            {french: "adopter", russian: "принимать, усваивать"},
-            {french: "aider", russian: "помогать"},
-            {french: "aimer", russian: "любить"},
-            {french: "aller", russian: "идти, ехать"},
-            {french: "améliorer", russian: "улучшать"},
-            {french: "ancrer", russian: "закреплять"},
-            {french: "apprendre", russian: "изучать, учиться"},
-            {french: "approcher", russian: "приближаться"},
-            {french: "atteindre", russian: "достигать"},
-            {french: "avoir", russian: "иметь"},
-            {french: "commander", russian: "заказывать"},
-            {french: "commettre", russian: "совершать"},
-            {french: "comprendre", russian: "понимать"},
-            {french: "concerner", russian: "касаться"},
-            {french: "connaître", russian: "знать"},
-            {french: "conseiller", russian: "советовать"},
-            {french: "continuer", russian: "продолжать"},
-            {french: "créer", russian: "создавать"},
-            {french: "demander", russian: "спрашивать"},
-            {french: "dépendre", russian: "зависеть"},
-            {french: "détester", russian: "ненавидеть"},
-            {french: "développer", russian: "развивать"},
-            {french: "devoir", russian: "быть должным"},
-            {french: "dire", russian: "говорить"},
-            {french: "donner", russian: "давать"},
-            {french: "écouter", russian: "слушать"},
-            {french: "écrire", russian: "писать"},
-            {french: "entendre", russian: "слышать"},
-            {french: "entretenir", russian: "поддерживать"},
-            {french: "espérer", russian: "надеяться"},
-            {french: "essayer", russian: "пытаться"},
-            {french: "étudier", russian: "изучать"},
-            {french: "éviter", russian: "избегать"},
-            {french: "exercer", russian: "упражнять"},
-            {french: "exister", russian: "существовать"},
-            {french: "exprimer", russian: "выражать"},
-            {french: "faire", russian: "делать"},
-            {french: "finir", russian: "заканчивать"},
-            {french: "fixer", russian: "устанавливать"},
-            {french: "fonctionner", russian: "функционировать"},
-            {french: "forger", russian: "ковать"},
-            {french: "fuir", russian: "бежать"},
-            {french: "garder", russian: "хранить"},
-            {french: "habiter", russian: "жить"},
-            {french: "habituer", russian: "привыкать"},
-            {french: "identifier", russian: "определять"},
-            {french: "imaginer", russian: "воображать"},
-            {french: "intégrer", russian: "интегрировать"},
-            {french: "intéresser", russian: "интересовать"},
-            {french: "inviter", russian: "приглашать"},
-            {french: "lire", russian: "читать"},
-            {french: "maltraiter", russian: "плохо обращаться"},
-            {french: "manquer", russian: "не хватать"},
-            {french: "mesurer", russian: "измерять"},
-            {french: "négliger", russian: "пренебрегать"},
-            {french: "nourrir", russian: "питать"},
-            {french: "obtenir", russian: "получать"},
-            {french: "oublier", russian: "забывать"},
-            {french: "paraître", russian: "казаться"},
-            {french: "parler", russian: "говорить"},
-            {french: "participer", russian: "участвовать"},
-            {french: "passer", russian: "проходить"},
-            {french: "payer", russian: "платить"},
-            {french: "permettre", russian: "позволять"},
-            {french: "persévérer", russian: "упорствовать"},
-            {french: "personnaliser", russian: "персонализировать"},
-            {french: "pouvoir", russian: "мочь"},
-            {french: "pratiquer", russian: "практиковать"},
-            {french: "prendre", russian: "брать"},
-            {french: "présenter", russian: "представлять"},
-            {french: "privilégier", russian: "отдавать предпочтение"},
-            {french: "progresser", russian: "прогрессировать"},
-            {french: "profiter", russian: "пользоваться"},
-            {french: "recommander", russian: "рекомендовать"},
-            {french: "redoubler", russian: "удваивать"},
-            {french: "regarder", russian: "смотреть"},
-            {french: "répéter", russian: "повторять"},
-            {french: "rester", russian: "оставаться"},
-            {french: "résister", russian: "сопротивляться"},
-            {french: "réussir", russian: "удаваться"},
-            {french: "savoir", russian: "знать"},
-            {french: "sentir", russian: "чувствовать"},
-            {french: "stagner", russian: "застаиваться"},
-            {french: "stresser", russian: "нервничать"},
-            {french: "structurer", russian: "структурировать"},
-            {french: "suivre", russian: "следовать"},
-            {french: "tâcher", russian: "стараться"},
-            {french: "travailler", russian: "работать"},
-            {french: "tromper", russian: "обманывать"},
-            {french: "utiliser", russian: "использовать"},
-            {french: "voir", russian: "видеть"},
-            {french: "vouloir", russian: "хотеть"}
-        ];
+      // Vocabulary data
+      const verbs = [
+        { original: "abandonner", translation: "бросать, оставлять" },
+        { original: "accorder", translation: "предоставлять, давать" },
+        { original: "adapter", translation: "адаптировать, приспосабливать" },
+        { original: "adopter", translation: "принимать, усваивать" },
+        { original: "aider", translation: "помогать" },
+        { original: "aimer", translation: "любить" },
+        { original: "aller", translation: "идти, ехать" },
+        { original: "améliorer", translation: "улучшать" },
+        { original: "ancrer", translation: "закреплять" },
+        { original: "apprendre", translation: "изучать, учиться" },
+        { original: "approcher", translation: "приближаться" },
+        { original: "atteindre", translation: "достигать" },
+        { original: "avoir", translation: "иметь" },
+        { original: "commander", translation: "заказывать" },
+        { original: "commettre", translation: "совершать" },
+        { original: "comprendre", translation: "понимать" },
+        { original: "concerner", translation: "касаться" },
+        { original: "connaître", translation: "знать" },
+        { original: "conseiller", translation: "советовать" },
+        { original: "continuer", translation: "продолжать" },
+        { original: "créer", translation: "создавать" },
+        { original: "demander", translation: "спрашивать" },
+        { original: "dépendre", translation: "зависеть" },
+        { original: "détester", translation: "ненавидеть" },
+        { original: "développer", translation: "развивать" },
+        { original: "devoir", translation: "быть должным" },
+        { original: "dire", translation: "говорить" },
+        { original: "donner", translation: "давать" },
+        { original: "écouter", translation: "слушать" },
+        { original: "écrire", translation: "писать" },
+        { original: "entendre", translation: "слышать" },
+        { original: "entretenir", translation: "поддерживать" },
+        { original: "espérer", translation: "надеяться" },
+        { original: "essayer", translation: "пытаться" },
+        { original: "étudier", translation: "изучать" },
+        { original: "éviter", translation: "избегать" },
+        { original: "exercer", translation: "упражнять" },
+        { original: "exister", translation: "существовать" },
+        { original: "exprimer", translation: "выражать" },
+        { original: "faire", translation: "делать" },
+        { original: "finir", translation: "заканчивать" },
+        { original: "fixer", translation: "устанавливать" },
+        { original: "fonctionner", translation: "функционировать" },
+        { original: "forger", translation: "ковать" },
+        { original: "fuir", translation: "бежать" },
+        { original: "garder", translation: "хранить" },
+        { original: "habiter", translation: "жить" },
+        { original: "habituer", translation: "привыкать" },
+        { original: "identifier", translation: "определять" },
+        { original: "imaginer", translation: "воображать" },
+        { original: "intégrer", translation: "интегрировать" },
+        { original: "intéresser", translation: "интересовать" },
+        { original: "inviter", translation: "приглашать" },
+        { original: "lire", translation: "читать" },
+        { original: "maltraiter", translation: "плохо обращаться" },
+        { original: "manquer", translation: "не хватать" },
+        { original: "mesurer", translation: "измерять" },
+        { original: "négliger", translation: "пренебрегать" },
+        { original: "nourrir", translation: "питать" },
+        { original: "obtenir", translation: "получать" },
+        { original: "oublier", translation: "забывать" },
+        { original: "paraître", translation: "казаться" },
+        { original: "parler", translation: "говорить" },
+        { original: "participer", translation: "участвовать" },
+        { original: "passer", translation: "проходить" },
+        { original: "payer", translation: "платить" },
+        { original: "permettre", translation: "позволять" },
+        { original: "persévérer", translation: "упорствовать" },
+        { original: "personnaliser", translation: "персонализировать" },
+        { original: "pouvoir", translation: "мочь" },
+        { original: "pratiquer", translation: "практиковать" },
+        { original: "prendre", translation: "брать" },
+        { original: "présenter", translation: "представлять" },
+        { original: "privilégier", translation: "отдавать предпочтение" },
+        { original: "progresser", translation: "прогрессировать" },
+        { original: "profiter", translation: "пользоваться" },
+        { original: "recommander", translation: "рекомендовать" },
+        { original: "redoubler", translation: "удваивать" },
+        { original: "regarder", translation: "смотреть" },
+        { original: "répéter", translation: "повторять" },
+        { original: "rester", translation: "оставаться" },
+        { original: "résister", translation: "сопротивляться" },
+        { original: "réussir", translation: "удаваться" },
+        { original: "savoir", translation: "знать" },
+        { original: "sentir", translation: "чувствовать" },
+        { original: "stagner", translation: "застаиваться" },
+        { original: "stresser", translation: "нервничать" },
+        { original: "structurer", translation: "структурировать" },
+        { original: "suivre", translation: "следовать" },
+        { original: "tâcher", translation: "стараться" },
+        { original: "travailler", translation: "работать" },
+        { original: "tromper", translation: "обманывать" },
+        { original: "utiliser", translation: "использовать" },
+        { original: "voir", translation: "видеть" },
+        { original: "vouloir", translation: "хотеть" },
+      ];
 
-        // Game state
-        let gameQueue = [];
-        let knownWords = [];
-        let allWords = [...verbs];
-        let currentCard = null;
-        let isFlipped = false;
-        let gameStarted = false;
+      // Game state
+      let gameQueue = [];
+      let knownWords = [];
+      let allWords = [...verbs];
+      let currentCard = null;
+      let isFlipped = false;
+      let gameStarted = false;
 
-        // Storage keys
-        const STORAGE_KEYS = {
-            gameQueue: 'frenchCards_gameQueue',
-            knownWords: 'frenchCards_knownWords',
-            allWords: 'frenchCards_allWords',
-            gameStarted: 'frenchCards_gameStarted'
-        };
+      // Touch handling
+      let touchStartY = 0;
+      let touchStartX = 0;
+      let isSwiping = false;
 
-        // DOM elements
-        const flashcard = document.getElementById('flashcard');
-        const frenchWord = document.getElementById('frenchWord');
-        const russianWord = document.getElementById('russianWord');
-        const cardsLeft = document.getElementById('cardsLeft');
-        const knownCount = document.getElementById('knownCount');
-        const cardContainer = document.getElementById('cardContainer');
-        const gameOver = document.getElementById('gameOver');
-        const restartBtn = document.getElementById('restartBtn');
-        const flipBtn = document.getElementById('flipBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const knowBtn = document.getElementById('knowBtn');
-        const newWordsInput = document.getElementById('newWordsInput');
-        const addWordsBtn = document.getElementById('addWordsBtn');
-        const resetBtn = document.getElementById('resetBtn');
+      // Storage keys
+      const STORAGE_KEYS = {
+        gameQueue: "cards_gameQueue",
+        knownWords: "cards_knownWords",
+        allWords: "cards_allWords",
+        gameStarted: "cards_gameStarted",
+      };
 
-        // Local Storage functions
-        function saveGameState() {
-            try {
-                localStorage.setItem(STORAGE_KEYS.gameQueue, JSON.stringify(gameQueue));
-                localStorage.setItem(STORAGE_KEYS.knownWords, JSON.stringify(knownWords));
-                localStorage.setItem(STORAGE_KEYS.allWords, JSON.stringify(allWords));
-                localStorage.setItem(STORAGE_KEYS.gameStarted, JSON.stringify(gameStarted));
-            } catch (e) {
-                console.warn('Could not save game state to localStorage:', e);
-            }
+      // DOM elements
+      const flashcard = document.getElementById("flashcard");
+      const word = document.getElementById("word");
+      const translation = document.getElementById("translation");
+      const cardsLeft = document.getElementById("cardsLeft");
+      const knownCount = document.getElementById("knownCount");
+      const cardContainer = document.getElementById("cardContainer");
+      const gameOver = document.getElementById("gameOver");
+      const restartBtn = document.getElementById("restartBtn");
+      const flipBtn = document.getElementById("flipBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const knowBtn = document.getElementById("knowBtn");
+      const newWordsInput = document.getElementById("newWordsInput");
+      const addWordsBtn = document.getElementById("addWordsBtn");
+      const resetBtn = document.getElementById("resetBtn");
+      const swipeIndicator = document.getElementById("swipeIndicator");
+
+      // Local Storage functions
+      function saveGameState() {
+        try {
+          localStorage.setItem(STORAGE_KEYS.gameQueue, JSON.stringify(gameQueue));
+          localStorage.setItem(STORAGE_KEYS.knownWords, JSON.stringify(knownWords));
+          localStorage.setItem(STORAGE_KEYS.allWords, JSON.stringify(allWords));
+          localStorage.setItem(STORAGE_KEYS.gameStarted, JSON.stringify(gameStarted));
+        } catch (e) {
+          console.warn("Could not save game state to localStorage:", e);
         }
+      }
 
-        function loadGameState() {
-            try {
-                const savedQueue = localStorage.getItem(STORAGE_KEYS.gameQueue);
-                const savedKnown = localStorage.getItem(STORAGE_KEYS.knownWords);
-                const savedAllWords = localStorage.getItem(STORAGE_KEYS.allWords);
-                const savedGameStarted = localStorage.getItem(STORAGE_KEYS.gameStarted);
+      function loadGameState() {
+        try {
+          const savedQueue = localStorage.getItem(STORAGE_KEYS.gameQueue);
+          const savedKnown = localStorage.getItem(STORAGE_KEYS.knownWords);
+          const savedAllWords = localStorage.getItem(STORAGE_KEYS.allWords);
+          const savedGameStarted = localStorage.getItem(STORAGE_KEYS.gameStarted);
 
-                if (savedQueue) gameQueue = JSON.parse(savedQueue);
-                if (savedKnown) knownWords = JSON.parse(savedKnown);
-                if (savedAllWords) allWords = JSON.parse(savedAllWords);
-                if (savedGameStarted) gameStarted = JSON.parse(savedGameStarted);
+          if (savedQueue) gameQueue = JSON.parse(savedQueue);
+          if (savedKnown) knownWords = JSON.parse(savedKnown);
+          if (savedAllWords) allWords = JSON.parse(savedAllWords);
+          if (savedGameStarted) gameStarted = JSON.parse(savedGameStarted);
 
-                // If no saved data or empty queue, initialize with default verbs
-                if (!savedQueue || gameQueue.length === 0) {
-                    gameQueue = shuffleArray([...allWords]);
-                    gameStarted = false;
-                }
-
-                return true;
-            } catch (e) {
-                console.warn('Could not load game state from localStorage:', e);
-                return false;
-            }
-        }
-
-        function clearGameState() {
-            try {
-                Object.values(STORAGE_KEYS).forEach(key => {
-                    localStorage.removeItem(key);
-                });
-            } catch (e) {
-                console.warn('Could not clear game state from localStorage:', e);
-            }
-        }
-
-        // Shuffle array function
-        function shuffleArray(array) {
-            const shuffled = [...array];
-            for (let i = shuffled.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-            }
-            return shuffled;
-        }
-
-        // Initialize game
-        function initGame() {
-            // Try to load saved state first
-            const loaded = loadGameState();
-            
-            if (!loaded || gameQueue.length === 0) {
-                // If no saved state or empty queue, reset to shuffled default verbs
-                gameQueue = shuffleArray([...allWords]);
-                knownWords = [];
-                gameStarted = false;
-            }
-            
-            isFlipped = false;
-            flashcard.classList.remove('flipped');
-            
-            if (gameStarted && gameQueue.length > 0) {
-                currentCard = gameQueue[0];
-                frenchWord.textContent = currentCard.french;
-                russianWord.textContent = currentCard.russian;
-            } else {
-                frenchWord.textContent = "Click to start!";
-                russianWord.textContent = "Перевод";
-            }
-            
-            updateCounters();
-            saveGameState();
-        }
-
-        // Parse new words from textarea
-        function parseNewWords(text) {
-            const lines = text.trim().split('\n');
-            const newWords = [];
-            
-            for (let line of lines) {
-                line = line.trim();
-                if (!line) continue;
-                
-                const parts = line.split('\t');
-                if (parts.length >= 2) {
-                    const french = parts[0].trim();
-                    const russian = parts.slice(1).join('\t').trim(); // In case translation contains tabs
-                    
-                    if (french && russian) {
-                        // Check if word already exists
-                        const exists = allWords.some(word => 
-                            word.french.toLowerCase() === french.toLowerCase()
-                        );
-                        
-                        if (!exists) {
-                            newWords.push({ french, russian });
-                        }
-                    }
-                }
-            }
-            
-            return newWords;
-        }
-
-        // Add new words to the game
-        function addNewWords() {
-            const inputText = newWordsInput.value;
-            if (!inputText.trim()) return;
-            
-            const newWords = parseNewWords(inputText);
-            if (newWords.length === 0) {
-                alert('No valid words found. Please check the format:\nfrench-word[TAB]translation');
-                return;
-            }
-            
-            // Add to all words
-            allWords.push(...newWords);
-            
-            // Shuffle new words and add to end of queue
-            const shuffledNewWords = shuffleArray([...newWords]);
-            gameQueue.push(...shuffledNewWords);
-            
-            // Clear input
-            newWordsInput.value = '';
-            
-            // Update UI and save
-            updateCounters();
-            saveGameState();
-            
-            alert(`Added ${newWords.length} new words to the game!`);
-        }
-
-        // Reset entire game
-        function resetGame() {
-            if (confirm('This will reset all progress and remove custom words. Are you sure?')) {
-                clearGameState();
-                allWords = [...verbs]; // Reset to original verbs only
-                gameQueue = shuffleArray([...allWords]);
-                knownWords = [];
-                gameStarted = false;
-                isFlipped = false;
-                flashcard.classList.remove('flipped');
-                frenchWord.textContent = "Click to start!";
-                russianWord.textContent = "Перевод";
-                newWordsInput.value = '';
-                updateCounters();
-                saveGameState();
-            }
-        }
-
-        // Start game
-        function startGame() {
-            if (!gameStarted) {
-                gameStarted = true;
-                nextCard();
-            }
-        }
-
-        // Show next card
-        function nextCard() {
-            if (gameQueue.length === 0) {
-                showGameOver();
-                return;
-            }
-
-            currentCard = gameQueue[0];
-            isFlipped = false;
-            flashcard.classList.remove('flipped');
-            frenchWord.textContent = currentCard.french;
-            russianWord.textContent = currentCard.russian;
-            saveGameState();
-        }
-
-        // Flip card
-        function flipCard() {
-            if (!gameStarted) {
-                startGame();
-                return;
-            }
-            
-            isFlipped = !isFlipped;
-            flashcard.classList.toggle('flipped');
-        }
-
-        // Move current word to end of queue
-        function moveToEnd() {
-            if (!gameStarted || gameQueue.length === 0) return;
-            
-            const word = gameQueue.shift();
-            gameQueue.push(word);
-            nextCard();
-        }
-
-        // Mark word as known
-        function markAsKnown() {
-            if (!gameStarted || gameQueue.length === 0) return;
-            
-            const word = gameQueue.shift();
-            knownWords.push(word);
-            updateCounters();
-            nextCard();
-        }
-
-        // Update counters
-        function updateCounters() {
-            cardsLeft.textContent = gameQueue.length;
-            knownCount.textContent = knownWords.length;
-        }
-
-        // Show game over screen
-        function showGameOver() {
-            gameOver.classList.remove('hidden');
-        }
-
-        // Restart game
-        function restartGame() {
-            gameOver.classList.add('hidden');
-            // Reset queue from all words (including custom ones)
+          // If no saved data or empty queue, initialize with default verbs
+          if (!savedQueue || gameQueue.length === 0) {
             gameQueue = shuffleArray([...allWords]);
-            knownWords = [];
             gameStarted = false;
-            isFlipped = false;
-            flashcard.classList.remove('flipped');
-            frenchWord.textContent = "Click to start!";
-            russianWord.textContent = "Перевод";
-            updateCounters();
-            saveGameState();
+          }
+
+          return true;
+        } catch (e) {
+          console.warn("Could not load game state from localStorage:", e);
+          return false;
+        }
+      }
+
+      // Flip card (only if not swiping)
+      function flipCard() {
+        if (isSwiping) {
+          isSwiping = false;
+          return;
         }
 
-        // Event listeners
-        cardContainer.addEventListener('click', flipCard);
-        flipBtn.addEventListener('click', flipCard);
-        nextBtn.addEventListener('click', moveToEnd);
-        knowBtn.addEventListener('click', markAsKnown);
-        restartBtn.addEventListener('click', restartGame);
-        addWordsBtn.addEventListener('click', addNewWords);
-        resetBtn.addEventListener('click', resetGame);
+        if (!gameStarted) {
+          startGame();
+          return;
+        }
 
-        // Keyboard controls
-        document.addEventListener('keydown', (e) => {
-            switch(e.key.toLowerCase()) {
-                case ' ':
-                    e.preventDefault();
-                    flipCard();
-                    break;
-                case 'n':
-                    moveToEnd();
-                    break;
-                case 'k':
-                    markAsKnown();
-                    break;
+        isFlipped = !isFlipped;
+        flashcard.classList.toggle("flipped");
+      }
+
+      // Show swipe indicator
+      function showSwipeIndicator(direction) {
+        if (direction === "up") {
+          swipeIndicator.textContent = "✅";
+          swipeIndicator.className = "swipe-indicator swipe-up show";
+        } else if (direction === "down") {
+          swipeIndicator.textContent = "⏭️";
+          swipeIndicator.className = "swipe-indicator swipe-down show";
+        }
+      }
+
+      // Hide swipe indicator
+      function hideSwipeIndicator() {
+        swipeIndicator.className = "swipe-indicator";
+      }
+
+      // Touch event handlers
+      function handleTouchStart(e) {
+        if (!gameStarted || gameQueue.length === 0) return;
+
+        const touch = e.touches[0];
+        touchStartY = touch.clientY;
+        touchStartX = touch.clientX;
+        isSwiping = false;
+      }
+
+      function handleTouchMove(e) {
+        if (!gameStarted || gameQueue.length === 0) return;
+
+        const touch = e.touches[0];
+        const deltaY = touch.clientY - touchStartY;
+        const deltaX = touch.clientX - touchStartX;
+
+        // Only consider vertical swipes (more Y movement than X)
+        if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 30) {
+          isSwiping = true;
+
+          if (deltaY < -50) {
+            // Swipe up
+            showSwipeIndicator("up");
+          } else if (deltaY > 50) {
+            // Swipe down
+            showSwipeIndicator("down");
+          } else {
+            hideSwipeIndicator();
+          }
+        } else if (Math.abs(deltaY) < 20 && Math.abs(deltaX) < 20) {
+          hideSwipeIndicator();
+          isSwiping = false;
+        }
+      }
+
+      function handleTouchEnd(e) {
+        if (!gameStarted || gameQueue.length === 0) return;
+
+        const touch = e.changedTouches[0];
+        const deltaY = touch.clientY - touchStartY;
+        const deltaX = touch.clientX - touchStartX;
+
+        hideSwipeIndicator();
+
+        // Only process swipe if it was primarily vertical
+        if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 50) {
+          if (deltaY < -50) {
+            // Swipe up - mark as known
+            markAsKnown();
+            isSwiping = true;
+          } else if (deltaY > 50) {
+            // Swipe down - move to end
+            moveToEnd();
+            isSwiping = true;
+          }
+        }
+      }
+
+      // Shuffle array function
+      function shuffleArray(array) {
+        const shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+      }
+
+      // Initialize game
+      function initGame() {
+        // Try to load saved state first
+        const loaded = loadGameState();
+
+        if (!loaded || gameQueue.length === 0) {
+          // If no saved state or empty queue, reset to shuffled default verbs
+          gameQueue = shuffleArray([...allWords]);
+          knownWords = [];
+          gameStarted = false;
+        }
+
+        isFlipped = false;
+        flashcard.classList.remove("flipped");
+
+        if (gameStarted && gameQueue.length > 0) {
+          currentCard = gameQueue[0];
+          word.textContent = currentCard.original;
+          translation.textContent = currentCard.translation;
+        } else {
+          word.textContent = "Click to start!";
+          translation.textContent = "Перевод";
+        }
+
+        updateCounters();
+        saveGameState();
+      }
+
+      // Parse new words from textarea
+      function parseNewWords(text) {
+        const lines = text.trim().split("\n");
+        const newWords = [];
+
+        for (let line of lines) {
+          line = line.trim();
+          if (!line) continue;
+
+          const parts = line.split("=");
+          if (parts.length >= 2) {
+            const original = parts[0].trim();
+            const translation = parts[1].trim();
+
+            if (original && translation) {
+              // Check if word already exists
+              const exists = allWords.some(
+                (word) => word.original.toLowerCase() === original.toLowerCase(),
+              );
+
+              if (!exists) {
+                newWords.push({ original, translation });
+              }
             }
-        });
+          }
+        }
 
-        // Initialize game on load
-        initGame();
+        return newWords;
+      }
+
+      // Add new words to the game
+      function addNewWords() {
+        const inputText = newWordsInput.value;
+        if (!inputText.trim()) return;
+
+        const newWords = parseNewWords(inputText);
+        if (newWords.length === 0) {
+          alert(
+            "No valid words found. Please check the format:\nword=translation",
+          );
+          return;
+        }
+
+        // Add to all words
+        allWords.push(...newWords);
+
+        // Shuffle new words and add to end of queue
+        const shuffledNewWords = shuffleArray([...newWords]);
+        gameQueue.push(...shuffledNewWords);
+
+        // Clear input
+        newWordsInput.value = "";
+
+        // Update UI and save
+        updateCounters();
+        saveGameState();
+
+        alert(`Added ${newWords.length} new words to the game!`);
+      }
+
+      // Reset entire game
+      function resetGame() {
+        if (
+          confirm("This will reset all progress and remove custom words. Are you sure?")
+        ) {
+          clearGameState();
+          allWords = [...verbs]; // Reset to original verbs only
+          gameQueue = shuffleArray([...allWords]);
+          knownWords = [];
+          gameStarted = false;
+          isFlipped = false;
+          flashcard.classList.remove("flipped");
+          word.textContent = "Click to start!";
+          translation.textContent = "Перевод";
+          newWordsInput.value = "";
+          updateCounters();
+          saveGameState();
+        }
+      }
+
+      // Start game
+      function startGame() {
+        if (!gameStarted) {
+          gameStarted = true;
+          nextCard();
+        }
+      }
+
+      // Show next card
+      function nextCard() {
+        if (gameQueue.length === 0) {
+          showGameOver();
+          return;
+        }
+
+        currentCard = gameQueue[0];
+        isFlipped = false;
+        flashcard.classList.remove("flipped");
+        word.textContent = currentCard.original;
+        translation.textContent = currentCard.translation;
+        saveGameState();
+      }
+
+      // Move current word to end of queue
+      function moveToEnd() {
+        if (!gameStarted || gameQueue.length === 0) return;
+
+        const word = gameQueue.shift();
+        gameQueue.push(word);
+        nextCard();
+      }
+
+      // Mark word as known
+      function markAsKnown() {
+        if (!gameStarted || gameQueue.length === 0) return;
+
+        const word = gameQueue.shift();
+        knownWords.push(word);
+        updateCounters();
+        nextCard();
+      }
+
+      // Update counters
+      function updateCounters() {
+        cardsLeft.textContent = gameQueue.length;
+        knownCount.textContent = knownWords.length;
+      }
+
+      // Show game over screen
+      function showGameOver() {
+        gameOver.classList.remove("hidden");
+      }
+
+      // Restart game
+      function restartGame() {
+        gameOver.classList.add("hidden");
+        // Reset queue from all words (including custom ones)
+        gameQueue = shuffleArray([...allWords]);
+        knownWords = [];
+        gameStarted = false;
+        isFlipped = false;
+        flashcard.classList.remove("flipped");
+        word.textContent = "Click to start!";
+        translation.textContent = "Перевод";
+        updateCounters();
+        saveGameState();
+      }
+
+      // Event listeners
+      cardContainer.addEventListener("click", flipCard);
+      cardContainer.addEventListener("touchstart", handleTouchStart, { passive: true });
+      cardContainer.addEventListener("touchmove", handleTouchMove, { passive: true });
+      cardContainer.addEventListener("touchend", handleTouchEnd, { passive: true });
+      flipBtn.addEventListener("click", flipCard);
+      nextBtn.addEventListener("click", moveToEnd);
+      knowBtn.addEventListener("click", markAsKnown);
+      restartBtn.addEventListener("click", restartGame);
+      addWordsBtn.addEventListener("click", addNewWords);
+      resetBtn.addEventListener("click", resetGame);
+
+      // Keyboard controls
+      document.addEventListener("keydown", (e) => {
+        switch (e.key.toLowerCase()) {
+          case " ":
+            e.preventDefault();
+            flipCard();
+            break;
+          case "n":
+            moveToEnd();
+            break;
+          case "k":
+            markAsKnown();
+            break;
+        }
+      });
+
+      // Initialize game on load
+      initGame();
     </script>
-</body>
+  </body>
 </html>
