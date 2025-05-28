@@ -423,8 +423,8 @@
         <div class="controls">
           <h3>Controls</h3>
           <button id="flipBtn" class="button btn-blue">🔄 Flip Card (Space/Tap)</button>
-          <button id="nextBtn" class="button btn-yellow">⏭️ Next Card (N/Swipe up)</button>
-          <button id="knowBtn" class="button btn-green">✅ I Know This (K/Swipe down)</button>
+          <button id="nextBtn" class="button btn-yellow">⏭️ Next Card (N/Swipe down)</button>
+          <button id="knowBtn" class="button btn-green">✅ I Know This (K/Swipe up)</button>
         </div>
 
         <!-- Instructions -->
@@ -436,10 +436,10 @@
               translation
             </li>
             <li>
-              Press <span class="kbd">N</span> or <span class="kbd">Swipe up</span> to move current word to end of queue
+              Press <span class="kbd">N</span> or <span class="kbd">Swipe down</span> to move current word to end of queue
             </li>
             <li>
-              Press <span class="kbd">K</span> or <span class="kbd">Swipe down</span> if you know the word (removes from queue)
+              Press <span class="kbd">K</span> or <span class="kbd">Swipe up</span> if you know the word (removes from queue)
             </li>
             <li>
               <strong>Mobile:</strong> Swipe ⬆️ to mark as known, swipe ⬇️ to move to
@@ -588,6 +588,7 @@
       let touchStartY = 0;
       let touchStartX = 0;
       let isSwiping = false;
+      let touchStartedOnCard = false;
 
       // Storage keys
       const STORAGE_KEYS = {
@@ -687,6 +688,9 @@
       function handleTouchStart(e) {
         if (!gameStarted || gameQueue.length === 0) return;
 
+        // Check if the touch started on the card
+        touchStartedOnCard = e.target.closest("#cardContainer") !== null;
+
         const touch = e.touches[0];
         touchStartY = touch.clientY;
         touchStartX = touch.clientX;
@@ -695,12 +699,14 @@
 
       function handleTouchMove(e) {
         if (!gameStarted || gameQueue.length === 0) return;
-
-        e.preventDefault();
+        if (!touchStartedOnCard) return; // Only process touches that started on the card
 
         const touch = e.touches[0];
         const deltaY = touch.clientY - touchStartY;
         const deltaX = touch.clientX - touchStartX;
+
+        // Prevent page scrolling when swiping on the card
+        e.preventDefault();
 
         // Only consider vertical swipes (more Y movement than X)
         if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 30) {
@@ -723,8 +729,6 @@
 
       function handleTouchEnd(e) {
         if (!gameStarted || gameQueue.length === 0) return;
-
-        e.preventDefault();
 
         const touch = e.changedTouches[0];
         const deltaY = touch.clientY - touchStartY;
@@ -932,10 +936,15 @@
         saveGameState();
       }
 
+      // Prevent all scrolling on the page
+      // document.addEventListener('touchmove', function(e) {
+      //     e.preventDefault();
+      // }, { passive: false });
+
       // Event listeners
       cardContainer.addEventListener("click", flipCard);
       cardContainer.addEventListener("touchstart", handleTouchStart, { passive: true });
-      cardContainer.addEventListener("touchmove", handleTouchMove, { passive: true });
+      cardContainer.addEventListener("touchmove", handleTouchMove, { passive: false });
       cardContainer.addEventListener("touchend", handleTouchEnd, { passive: true });
       flipBtn.addEventListener("click", flipCard);
       nextBtn.addEventListener("click", moveToEnd);
